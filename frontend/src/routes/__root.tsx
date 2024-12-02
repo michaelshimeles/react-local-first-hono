@@ -9,6 +9,7 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
+  console.log('import.meta.env.DEV', import.meta.env.DEV)
   return (
     <>
       <div className="p-2 flex justify-between items-center w-full">
