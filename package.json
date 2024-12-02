@@ -2,7 +2,7 @@
   "name": "react-boilerplate",
   "scripts": {
     "dev": "bun run --hot server/index.ts",
-    "start": "bun run server/index.ts --host [::]"
+    "start": "bun run server/index.ts"
   },
   "dependencies": {
     "@clerk/backend": "^1.18.0",
