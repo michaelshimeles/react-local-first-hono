@@ -40,20 +40,7 @@ function RootComponent() {
       {/* <Meta> */}
       <Outlet />
       {/* </Meta> */}
-      <TanStackRouterDevtools />
+      {import.meta.env.DEV && <TanStackRouterDevtools />}
     </>
   );
 }
-
-// const TITLE = 'React Local';
-
-// function Meta({ children }: { children: ReactNode }) {
-//   const matches = useMatches();
-//   const meta = matches.at(-1)?.meta?.find((meta) => meta?.title);
-
-//   useEffect(() => {
-//     document.title = [meta?.title, TITLE].filter(Boolean).join(' · ');
-//   }, [meta]);
-
-//   return children;
-// }
