@@ -20,6 +20,8 @@ export const useSyncItems = () => {
         name: item.name,
       }));
 
+      console.log("WE IN")
+
       const response = await client.api.items.$post({
         json: cleanItems,
       });
