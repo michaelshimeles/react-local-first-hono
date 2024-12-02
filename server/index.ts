@@ -308,6 +308,8 @@ const userUpdate = async ({
 
 // Serve static assets first
 app.use("/*", serveStatic({ root: "../frontend/dist" }));
+app.use("/*", serveStatic({ root: "../frontend/dist/index.html" }));
+
 
 export type AppType = typeof apiRoutes;
 
