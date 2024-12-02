@@ -2,9 +2,9 @@ import { Pool } from "@neondatabase/serverless";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-serverless";
 import { Hono } from "hono";
+import { serveStatic } from "hono/bun";
 import { Webhook } from "svix";
 import { items, users } from "./db/schema";
-import { serveStatic } from "hono/bun";
 
 const app = new Hono();
 
@@ -306,8 +306,13 @@ const userUpdate = async ({
   }
 };
 
-app.use("*", serveStatic({ root: "../frontend/dist" }));
-app.use("*", serveStatic({ root: "../frontend/dist/index.html" }));
+// Serve static assets first
+app.use("/*", serveStatic({ root: "../frontend/dist" }));
+
+// Handle SPA routing - serve index.html for any unmatched routes
+app.all("*", async (c) => {
+  return c.html(await Bun.file("../frontend/dist/index.html").text());
+});
 
 export type AppType = typeof apiRoutes;
 
