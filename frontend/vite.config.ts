@@ -33,12 +33,12 @@ export default defineConfig({
       "@server": path.resolve(__dirname, "../server"),
     },
   },
-  server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3000',
-        changeOrigin: true,
-      }
-    }
-  },
+  // server: {
+  //   proxy: {
+  //     '/api': {
+  //       target: 'http://localhost:3000',
+  //       changeOrigin: true,
+  //     }
+  //   }
+  // },
 });
