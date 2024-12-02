@@ -12,16 +12,16 @@ export const Route = createFileRoute("/dashboard")({
   ssr: true,
   beforeLoad: async ({ context }: any) => {
     // Wait for auth to be initialized
-    console.log('context', context)
+    console.log("context", context);
     if (!context?.auth.isLoaded) {
       // Return early without redirecting while auth is loading
-      console.log('context?.auth.isLoading', context?.auth.isLoading)
+      console.log("context?.auth.isLoading", context?.auth.isLoading);
 
       return;
     }
 
     if (!context?.auth.isSignedIn) {
-      console.log('context?.auth.isSignedIn', context?.auth.isSignedIn)
+      console.log("context?.auth.isSignedIn", context?.auth.isSignedIn);
 
       throw redirect({
         to: "/auth",
@@ -146,12 +146,13 @@ function Dashboard() {
               <div className="flex gap-2 items-center">
                 <div className="flex items-center gap-2">
                   <span
-                    className={`inline-flex h-2 w-2 rounded-full ${item.syncStatus === "synced"
-                      ? "bg-green-500"
-                      : item.syncStatus === "pending"
-                        ? "bg-yellow-500"
-                        : "bg-red-500"
-                      }`}
+                    className={`inline-flex h-2 w-2 rounded-full ${
+                      item.syncStatus === "synced"
+                        ? "bg-green-500"
+                        : item.syncStatus === "pending"
+                          ? "bg-yellow-500"
+                          : "bg-red-500"
+                    }`}
                     title={`Sync Status: ${item.syncStatus}`}
                   />
                 </div>
