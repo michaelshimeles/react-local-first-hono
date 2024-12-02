@@ -8,8 +8,6 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/dashboard")({
-  component: Dashboard,
-  ssr: true,
   beforeLoad: async ({ context }: any) => {
     // Wait for auth to be initialized
     console.log("context", context);
@@ -28,6 +26,8 @@ export const Route = createFileRoute("/dashboard")({
       });
     }
   },
+  component: Dashboard,
+  ssr: true,
 });
 
 function Dashboard() {
