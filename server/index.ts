@@ -5,36 +5,35 @@ import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
 import { Webhook } from "svix";
 import { items, users } from "./db/schema";
+import { getAuth } from "@hono/clerk-auth";
 
 const app = new Hono();
 
-// app.use("*", clerkMiddleware());
+app.get("/protected", (c) => {
+  try {
+    const auth = getAuth(c);
 
-// .get("/protected", (c) => {
-//   try {
-//     const auth = getAuth(c);
+    console.log("Auth check details:", {
+      userId: auth?.userId,
+      sessionId: auth?.sessionId,
+      orgId: auth?.orgId,
+      fullAuthObject: auth,
+    });
 
-//     console.log("Auth check details:", {
-//       userId: auth?.userId,
-//       sessionId: auth?.sessionId,
-//       orgId: auth?.orgId,
-//       fullAuthObject: auth,
-//     });
+    if (!auth?.userId) {
+      console.log("No user ID found, returning 401");
+      return c.json({ error: "Unauthorized" }, 401);
+    }
 
-//     if (!auth?.userId) {
-//       console.log("No user ID found, returning 401");
-//       return c.json({ error: "Unauthorized" }, 401);
-//     }
-
-//     return c.json({
-//       message: "Protected endpoint",
-//       userId: auth?.userId,
-//     });
-//   } catch (error) {
-//     console.error("Unexpected error in protected route:", error);
-//     return c.json({ error: "Internal Server Error" }, 500);
-//   }
-// })
+    return c.json({
+      message: "Protected endpoint",
+      userId: auth?.userId,
+    });
+  } catch (error) {
+    console.error("Unexpected error in protected route:", error);
+    return c.json({ error: "Internal Server Error" }, 500);
+  }
+});
 
 const apiRoutes = app
   .basePath("/api")
@@ -309,7 +308,6 @@ const userUpdate = async ({
 // Serve static assets first
 app.use("*", serveStatic({ root: "./frontend/dist" }));
 app.use("*", serveStatic({ root: "./frontend/dist/index.html" }));
-
 
 export type AppType = typeof apiRoutes;
 

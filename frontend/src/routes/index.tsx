@@ -1,12 +1,45 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useDeleteItem } from "@/hooks/useDeleteItem";
-import { useSyncItems } from "@/hooks/useSyncItems";
-import db from "@/local/db";
 // import { ProtectedRoute } from "@/protected-route";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { FaBullseye, FaDatabase, FaLock, FaMobileAlt, FaRocket, FaSync } from 'react-icons/fa';
+
+const features = [
+  { icon: <FaDatabase />, title: 'Offline-first architecture' },
+  { icon: <FaSync />, title: 'Real-time synchronization' },
+  { icon: <FaMobileAlt />, title: 'Immediate local updates' },
+  { icon: <FaRocket />, title: 'Optimistic UI updates' },
+  { icon: <FaLock />, title: 'Conflict resolution' },
+  { icon: <FaBullseye />, title: 'TypeScript support' },
+]
+
+const benefits = [
+  {
+    title: 'Instant Responsiveness',
+    description: 'Zero-latency operations, no network waiting, and smooth UI updates.',
+  },
+  {
+    title: 'Offline Resilience',
+    description: 'Always available, background sync, and no data loss.',
+  },
+  {
+    title: 'Performance Benefits',
+    description: 'Reduced server load, optimized network usage, and efficient caching.',
+  },
+  {
+    title: 'Better User Experience',
+    description: 'No loading states, works everywhere, and reduced frustration.',
+  },
+]
+
+const techStack = [
+  'React',
+  'TanStack Query',
+  'Dexie.js',
+  'TypeScript',
+  'Tailwind CSS',
+  'Hono',
+  'PostgreSQL',
+  'Drizzle ORM',
+]
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -14,144 +47,80 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const [name, setName] = useState("");
-  const { mutate: syncItems } = useSyncItems();
-  const { mutate: deleteItem } = useDeleteItem();
-  const queryClient = useQueryClient();
-
-
-  // Use React Query to manage local items state
-  const { data: localItems = [] } = useQuery({
-    queryKey: ["localItems"],
-    queryFn: async () => {
-      const items = await db.items.toArray();
-      return items;
-    },
-    refetchOnWindowFocus: false,
-  });
-
-  // Auto-sync effect - runs every 5 seconds to batch sync pending items
-  useEffect(() => {
-    const autoSync = async () => {
-      const unsyncedItems = await db.items
-        .where("syncStatus")
-        .equals("pending")
-        .toArray();
-      if (unsyncedItems.length > 0) {
-        console.log("Auto-syncing batch of pending items:", unsyncedItems);
-        syncItems(unsyncedItems);
-      }
-    };
-
-    const interval = setInterval(autoSync, 5000); // Batch sync every 5 seconds
-    return () => clearInterval(interval);
-  }, [syncItems]);
-
-  const handleAdd = async (e: any) => {
-    e.preventDefault();
-    if (!name.trim()) return;
-
-    const newItem = {
-      id: crypto.randomUUID(),
-      name: name.trim(),
-      syncStatus: "pending" as const,
-      version: 0,
-      lastModified: Date.now(),
-    };
-
-    await db.items.add(newItem);
-    // Refresh local items
-    const items = await db.items.toArray();
-    queryClient.setQueryData(["localItems"], items);
-    setName("");
-    // No immediate sync - will be picked up by next batch sync
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      console.log("Deleting item:", id);
-      await deleteItem(id);
-
-      const items = await db.items.toArray();
-      queryClient.setQueryData(["localItems"], items);
-    } catch (error) {
-      console.error("Error deleting item:", error);
-    }
-  };
-
-  const handleSync = async () => {
-    const unsyncedItems = await db.items
-      .where("syncStatus")
-      .equals("pending")
-      .toArray();
-
-    if (unsyncedItems.length > 0) {
-      console.log("Manual sync of pending items:", unsyncedItems);
-      syncItems(unsyncedItems);
-    }
-  };
-
-  // Count pending items for UI feedback
-  const pendingCount = localItems.filter(
-    (item) => item.syncStatus === "pending"
-  ).length;
-
   return (
-    // <ProtectedRoute>
-    <div className="flex flex-col w-full justify-center items-center p-12">
-      <div className="flex flex-col justify-center items-start max-w-3xl">
-        <div className="flex justify-between">
-          <h1 className="text-2xl font-medium">
-            Local-First React App with TanStack Query + Hono RPC Backend
+    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center">
+          <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
+            Local-First React App
           </h1>
-        </div>
-        <form className="flex gap-2 py-4" onSubmit={handleAdd}>
-          <Input
-            type="text"
-            placeholder="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="mr-2"
-          />
-          <Button type="submit">Add Item</Button>
-        </form>
-        <div className="flex gap-4 py-4">
-          <Button onClick={handleSync}>
-            Sync to Server {pendingCount > 0 && `(${pendingCount} pending)`}
-          </Button>
-        </div>
-        {localItems.length > 0 && <h2 className="text-lg mb-2">Items</h2>}
-        <ul className="space-y-2 w-full">
-          {localItems.map((item, index) => (
-            <li
-              key={item.id || index}
-              className="flex items-center justify-between rounded-md border p-2"
+          <p className="mt-5 max-w-xl mx-auto text-xl text-gray-500">
+            with TanStack Query + Hono RPC Backend
+          </p>
+          <div className="mt-4 text-center">
+            <Link
+              to="/dashboard"
+              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
             >
-              <p>{item.name}</p>
-              <div className="flex gap-2 items-center">
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`inline-flex h-2 w-2 rounded-full ${item.syncStatus === "synced"
-                      ? "bg-green-500"
-                      : item.syncStatus === "pending"
-                        ? "bg-yellow-500"
-                        : "bg-red-500"
-                      }`}
-                    title={`Sync Status: ${item.syncStatus}`}
-                  />
+              Try Now
+            </Link>
+          </div>
+        </div>
+
+        <div className="mt-16">
+          <h2 className="text-3xl font-extrabold text-gray-900">Features</h2>
+          <div className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {features.map((feature, index) => (
+              <div key={index} className="pt-6">
+                <div className="flow-root bg-white shadow rounded-lg px-6 pb-8">
+                  <div className="-mt-6">
+                    <div>
+                      <span className="inline-flex items-center justify-center p-3 bg-indigo-500 rounded-md shadow-lg text-white">
+                        {feature.icon}
+                      </span>
+                    </div>
+                    <h3 className="mt-8 text-lg font-medium text-gray-900 tracking-tight">{feature.title}</h3>
+                  </div>
                 </div>
-                <Button
-                  onClick={() => handleDelete(item.id)}
-                  variant="destructive"
-                >
-                  Delete
-                </Button>
               </div>
-            </li>
-          ))}
-        </ul>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-16">
+          <h2 className="text-3xl font-extrabold text-gray-900">Why Local-First?</h2>
+          <div className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2">
+            {benefits.map((benefit, index) => (
+              <div key={index} className="bg-white overflow-hidden shadow rounded-lg">
+                <div className="px-4 py-5 sm:p-6">
+                  <h3 className="text-lg font-medium text-gray-900">{benefit.title}</h3>
+                  <p className="mt-2 text-sm text-gray-500">{benefit.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-16">
+          <h2 className="text-3xl font-extrabold text-gray-900">Tech Stack</h2>
+          <div className="mt-8 flex flex-wrap gap-4">
+            {techStack.map((tech, index) => (
+              <span key={index} className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+                {tech}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-16 text-center">
+          <a
+            href="https://github.com/michaelshimeles/react-local-first-hono"
+            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+          >
+            Get Started on GitHub
+          </a>
+        </div>
       </div>
     </div>
-    // </ProtectedRoute>
-  );
+  )
 }
