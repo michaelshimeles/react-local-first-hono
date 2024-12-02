@@ -199,7 +199,6 @@ const apiRoutes = app
   });
 
 const userCreate = async ({
-  c,
   email,
   first_name,
   last_name,
@@ -238,7 +237,6 @@ const userCreate = async ({
 };
 
 const userUpdate = async ({
-  c,
   email,
   first_name,
   last_name,
