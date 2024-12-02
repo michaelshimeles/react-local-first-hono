@@ -4,7 +4,11 @@ import { VitePWA } from "vite-plugin-pwa";
 import path from "path";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
+  mode: mode,
+  define: {
+    'import.meta.env.DEV': mode === 'development'
+  },
   plugins: [
     react(),
     TanStackRouterVite(),
@@ -41,4 +45,4 @@ export default defineConfig({
       }
     }
   },
-});
+}));
