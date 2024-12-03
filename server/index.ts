@@ -97,9 +97,7 @@ const apiRoutes = app
     });
   })
   .post("/webhook", async (c) => {
-    const WEBHOOK_SECRET = "whsec_pZ4+jdQMV1/Le+s5fic/aEnTiBvJf26F";
-
-    console.log("WEBHOOK_SECRET", WEBHOOK_SECRET);
+    const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
 
     if (!WEBHOOK_SECRET) {
       return c.json("Please add webhook scret from authentication provider", {
